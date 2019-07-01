@@ -5,7 +5,7 @@ App para biblioteca | "Nombre Proyecto"
 <ul>
 	<li>Esperanza</li>
 	<li>Alex</li>
-	<li>Manuel</li>
+	<li>Manuel Llanten</li>
 	<li>Felipe Farías C</li>
 </ul>
 
