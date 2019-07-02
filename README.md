@@ -4,8 +4,8 @@ App para biblioteca | "Nombre Proyecto"
 <h3>Equipo</h3>
 <ul>
 	<li>Esperanza Herrera</li>
-	<li>Alex Godoy</li>
-	<li>Manuel Llanten</li>
+	<li>Alex godoy</li>
+	<li>Manuel LLanten</li>
 	<li>Felipe Farías C</li>
 </ul>
 
