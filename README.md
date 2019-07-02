@@ -3,8 +3,8 @@ App para biblioteca | "Nombre Proyecto"
 
 <h3>Equipo</h3>
 <ul>
-	<li>Esperanza</li>
-	<li>Alex</li>
+	<li>Esperanza Herrera</li>
+	<li>Alex Godoy</li>
 	<li>Manuel Llanten</li>
 	<li>Felipe Farías C</li>
 </ul>
