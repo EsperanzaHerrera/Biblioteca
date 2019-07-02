@@ -1,5 +1,5 @@
 <h2># biblioteca</h2>
-App para biblioteca | "Libreria tu ricon"
+App para biblioteca | "El Ricon Del Libro"
 
 <h3>Equipo</h3>
 <ul>
