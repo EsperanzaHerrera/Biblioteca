@@ -1,12 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-//Task Interface
-import { TaskI } from '../../models/task.interface';
-//servicios
+import { TaskI} from '../../models/task.interface';
 import { TodoService } from '../../services/todo.service';
-//ruta
-import { ActivatedRoute } from '@angular/router';
-//navC
+import { ActivatedRoute} from '@angular/router';
 import { NavController, LoadingController } from '@ionic/angular';
+
 
 @Component({
   selector: 'app-todo-details',
@@ -14,69 +11,54 @@ import { NavController, LoadingController } from '@ionic/angular';
   styleUrls: ['./todo-details.page.scss'],
 })
 export class TodoDetailsPage implements OnInit {
-  //creamos propiedad todo
+  
   todo: TaskI = {
     task: '',
     priority: 0
   };
-  //propiedad
-  todoId = null;
 
-  constructor(
-    private route: ActivatedRoute, private nav: NavController,
-    private todoService: TodoService, private loadingController: LoadingController
-  ) { } //injectamos nuestra ruta, nav, service y loading contr.
+  todoId= null;
 
-  //metodo
+  constructor(private route: ActivatedRoute, private nav: NavController, private todoService: TodoService, private loadingController: LoadingController) { }
+
   ngOnInit() {
     this.todoId = this.route.snapshot.params['id'];
-    //si hay algo, devuelve ..
-    if(this.todoId){
-      //si hay algo llamamos
-      //al metodo loadTodo 
+    if (this.todoId){
       this.loadTodo();
     }
   }
 
-  //metodo cargar
   async loadTodo(){
     const loading = await this.loadingController.create({
-      message: 'Loading....' //le pasamos un objeto mensaje
+      message: 'Loading....'
     });
-    //muestra minimodal con 'loading....'
     await loading.present();
-    this.todoService.getTodo(this.todoId).subscribe(res => {
-      loading.dismiss();
-      this.todo = res;
+
+    this.todoService.getTodo(this.todoId).subscribe(todo => {
+      loading.dismiss();;
+      this.todo = todo;
     });
   }
-  //guardar
-  async saveTodo(){
+
+  async saveTodo() {
     const loading = await this.loadingController.create({
-      message: 'Saving....' //le pasamos un objeto mensaje
-    });    
-    //muestra minimodal con 'saving....'
+      message: 'Saving....'
+    });
     await loading.present();
-    //comprobacion si es que existe id
-    if(this.todoId){
-      //actualizar
-      this.todoService.updateTodo(this.todo, this.todoId).then(()=> { // devuelve una promise o promesa
+ 
+    if (this.todoId) {
+      this.todoService.updateTodo(this.todo, this.todoId).then(() => {
         loading.dismiss();
         this.nav.navigateForward('/');
       });
     } else {
-      //agregar nuevo
-      this.todoService.addTodo(this.todo).then(()=> { // devuelve una promise o promesa
+      this.todoService.addTodo(this.todo).then(() => {
         loading.dismiss();
         this.nav.navigateForward('/');
       });
     }
   }
-
-  //metodo eliminar
-  onRemove(idTodo: string){
-    //console.log(todo);
+  async onRemoveTodo(idTodo:string) {
     this.todoService.removeTodo(idTodo);
   }
-
 }

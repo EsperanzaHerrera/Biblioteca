@@ -1,5 +1,5 @@
 export interface TaskI {
-    id?: string;
+    id?:string;
     task: string;
     priority: number;
 }
