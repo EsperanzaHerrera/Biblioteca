@@ -17,6 +17,6 @@ App para biblioteca | "El Ricon Del Libro"
 
 <img width="50px" src="https://firebasestorage.googleapis.com/v0/b/epe-3-y-4-biblioteca.appspot.com/o/html5-css3-js.png?alt=media&token=a100fd9a-c68b-4143-bf79-2f21a9cdd87f" alt="html js css thumb">  
 
-<img width="140px" src="https://firebasestorage.googleapis.com/v0/b/epe-3-y-4-biblioteca.appspot.com/o/ionic.png?alt=media&token=f3cc2465-7c9f-4836-b0a1-4973787b4c00" alt="ionic thumb">  
+<img width="50px" src="https://firebasestorage.googleapis.com/v0/b/epe-3-y-4-biblioteca.appspot.com/o/ionic.png?alt=media&token=f3cc2465-7c9f-4836-b0a1-4973787b4c00" alt="ionic thumb">  
 
-<img width="140px" src="https://firebasestorage.googleapis.com/v0/b/epe-3-y-4-biblioteca.appspot.com/o/angular.png?alt=media&token=f08f95f5-1810-4747-bfcb-000ee9ccd3c5" alt="angular thumb">  
+<img width="50px" src="https://firebasestorage.googleapis.com/v0/b/epe-3-y-4-biblioteca.appspot.com/o/angular.png?alt=media&token=f08f95f5-1810-4747-bfcb-000ee9ccd3c5" alt="angular thumb">  
