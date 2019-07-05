@@ -1,0 +1,453 @@
+Video:
+https://www.youtube.com/watch?v=fow7fHNW4Fw
+=============================================
+
+1- instalar e iniciar app
+
+>npm i ionic
+>ionic start miApp blank --type=angular
+>cd ./miApp/
+
+2- Configurar App, ingresar el comando y dirigirse a "enviroments/enviroment.ts" debe quedar así:
+
+> npm i firebase @angular/fire
+
+export const environment = {
+  production: false,
+  firebaseConfig: {
+    apiKey: "AIzaSyDUFbdZ6kCIyzrsFKMUMi0QJRgeKQvmWTo",
+    authDomain: "epe-iii-y-epe-iv.firebaseapp.com",
+    databaseURL: "https://epe-iii-y-epe-iv.firebaseio.com",
+    projectId: "epe-iii-y-epe-iv",
+    storageBucket: "epe-iii-y-epe-iv.appspot.com",
+    messagingSenderId: "701285456776",
+    appId: "1:701285456776:web:24a66f11c86d55ef"
+  }
+};
+
+3- crear páginas
+
+> ionic g page login
+> ionic g page register
+> ionic g page admin
+> ionic g service services/auth (servicio para login)
+> ionic g guard guards/auth     (para proteger páginas y admin)
+
+4- modificar app.modules.ts  debe quedar así:
+
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { RouteReuseStrategy } from '@angular/router';
+
+import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
+import { SplashScreen } from '@ionic-native/splash-screen/ngx';
+import { StatusBar } from '@ionic-native/status-bar/ngx';
+
+import { AppComponent } from './app.component';
+import { AppRoutingModule } from './app-routing.module';
+
+//importación de módules angular login 
+import { AngularFireModule } from '@angular/fire';
+import { AngularFireAuthModule } from '@angular/fire/auth';
+
+//traemos la confg. firebase
+import { environment } from './../environments/environment';
+
+
+@NgModule({
+  declarations: [AppComponent],
+  entryComponents: [],
+  imports: [BrowserModule, IonicModule.forRoot(), 
+    AppRoutingModule,
+    AngularFireModule.initializeApp(environment.firebaseConfig), // resive variable del config environment.ts
+    AngularFireAuthModule
+  ],
+  providers: [
+    StatusBar,
+    SplashScreen,
+    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
+  ],
+  bootstrap: [AppComponent]
+})
+export class AppModule {}
+
+
+5- modificar services/auth.services.ts  
+   debe quedar de la siguiente forma:
+
+import { Injectable } from '@angular/core';
+//importa módulo
+import { AngularFireAuth } from '@angular/fire/auth';
+import { User } from '../shared/user.class';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthService {
+  //propiedad de cualquier tipo
+  //con ella sabemos si nuestro usuario
+  //está logueado o no
+  public isLogged: any = false;
+
+  constructor(public afAuth: AngularFireAuth) {
+    //estado si es que el usuario
+    //está logueado o no, en caso de no estar
+    //logueado devuelve un null
+    afAuth.authState.subscribe( user => (this.isLogged = user))
+  }
+
+  //login 
+  async onLogin (user: User){
+    try{
+      //método para loguear
+      return await this.afAuth.auth.signInWithEmailAndPassword(
+        user.email, 
+        user.password
+      );
+    } catch (error){
+      console.log('Error on login', error);
+    }
+  }
+
+  //register
+  async onRegister (user: User){
+    try{
+      //método para crear usuario
+      return await this.afAuth.auth.createUserWithEmailAndPassword(
+        user.email, 
+        user.password
+      );
+    } catch (error) {
+      console.log('Error on register user', error);
+    }
+  }
+
+}
+
+diplomados -> 26 /home(x2)/admision(x1)
+
+6- crear carpeta "user" dentro de ./app/
+   también crear archivo "user.class.ts"
+   y debe quedar de esta forma:
+
+export class User {
+    email: string;
+    password: string;
+}
+
+
+7- modificamos register.page.html, debe quedar así
+
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Register</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content padding>
+  <ion-item>
+    <ion-label>
+      Email
+    </ion-label>
+    <ion-input type="text" [(ngModel)]="user.email"></ion-input>
+  </ion-item>
+  <ion-item>
+    <ion-label>
+      Password
+    </ion-label>
+    <ion-input type="text" [(ngModel)]="user.password"></ion-input>
+  </ion-item>
+  <ion-item-divider>
+    <ion-button size="large" (click)="onRegister()">Register</ion-button>
+    <ion-button size="large" href="/login">Login</ion-button>
+  </ion-item-divider>
+</ion-content>
+
+
+8- modificamos -> 'register.page.ts' debe quedar así.
+
+import { Component, OnInit } from '@angular/core';
+//importaciones
+import { Router } from '@angular/router';
+import { AuthService } from '../services/auth.service';
+import { User } from '../shared/user.class';
+
+@Component({
+  selector: 'app-register',
+  templateUrl: './register.page.html',
+  styleUrls: ['./register.page.scss'],
+})
+export class RegisterPage implements OnInit {
+  //instancia de nuestra clase
+  user: User = new User();
+  //injectamos service
+  //injectamos router
+  constructor(private authSvc: AuthService, private router: Router) {}
+
+  ngOnInit() {}
+
+  //método register para registrar nuevos usuarios
+  async onRegister(){
+    const user = await this.authSvc.onRegister(this.user);
+    //comprobar si hay un user
+    if(user){
+      console.log('Successfully created user!');
+      //redirecciona hacia home
+      this.router.navigateByUrl('/');
+    }
+  }
+
+}
+
+
+9- Editar página -> "login.page.ts"  debe quedar así:
+
+
+import { Component, OnInit } from '@angular/core';
+//redirecciona los usuarios una vez finalizado el login
+import { Router } from '@angular/router';
+//importar service
+import { AuthService } from '../services/auth.service';
+//importar clase
+import { User } from '../shared/user.class'
+
+//async = una función asíncrona
+//await = espera la respuesta del services para ejecutarse
+
+@Component({
+  selector: 'app-login',
+  templateUrl: './login.page.html',
+  styleUrls: ['./login.page.scss'],
+})
+export class LoginPage implements OnInit {
+  //nueva instancia
+  user: User = new User();
+  constructor(private router: Router, private authSvc: AuthService) {}
+
+  ngOnInit() {
+  }
+
+  //método on login
+  async onLogin(){
+    const user = await this.authSvc.onLogin(this.user);
+    if (user){
+      console.log("Successfully logged in! :D");
+      //redirección a home-page
+      this.router.navigateByUrl('/');
+    }
+  }
+
+}
+
+
+10- Editar página "login.page.html"  ->  Debe quedar así:
+
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Login</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content padding>
+  <ion-item>
+    <ion-label>
+      Email
+    </ion-label>
+    <ion-input type="text" [(ngModel)]="user.email"></ion-input>
+  </ion-item>
+  <ion-item>
+    <ion-label>
+      Password
+    </ion-label>
+    <ion-input type="password" [(ngModel)]="user.password"></ion-input>
+  </ion-item>
+  <ion-item-divider>
+    <ion-button size="large" (click)="onLogin()">Login</ion-button>
+    <ion-button size="large" href="/register">New</ion-button>
+  </ion-item-divider>
+</ion-content>
+
+
+11- Modificar "admin.page.html" debe quedar así:
+
+<ion-header>
+  <ion-toolbar>
+    <ion-title>admin</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-button size="large" href="/">Home</ion-button>
+</ion-content>
+
+
+12- modificamos "app-routing.module.ts" debe quedar así:
+
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+//importamos guard que sirve para
+//no permitir ingreso al usuario
+import { AuthGuard } from './guards/auth.guard';
+
+const routes: Routes = [
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
+  { 
+    path: 'home', 
+    loadChildren: './home/home.module#HomePageModule', 
+    canActivate: [AuthGuard] //agregamos esto a la ruta que vamos a proteger
+  },
+  { path: 'details/:id', loadChildren: 
+  './pages/todo-details/todo-details.module#TodoDetailsPageModule' },
+  { path:'details', loadChildren: 
+  './pages/todo-details/todo-details.module#TodoDetailsPageModule' },
+  { path: 'login', loadChildren: './login/login.module#LoginPageModule' },
+  { path: 'register', loadChildren: './register/register.module#RegisterPageModule' },
+  { 
+    path: 'admin', 
+    loadChildren: './admin/admin.module#AdminPageModule',
+    canActivate: [AuthGuard] //ruta protegida
+  }
+
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
+
+
+13- modificamos "auth.guard.ts" debe quedar así:
+
+import { Injectable } from '@angular/core';
+import { 
+  CanActivate, 
+  ActivatedRouteSnapshot, 
+  RouterStateSnapshot, 
+  UrlTree 
+} from '@angular/router';
+import { Observable } from 'rxjs';
+import { AuthService } from '../services/auth.service';
+import { Router } from '@angular/router';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthGuard implements CanActivate {
+  //injectamos nuestro service en constructor
+  constructor(private authSvc: AuthService, private router: Router){}
+  
+  canActivate(
+    next: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot): 
+    Observable<boolean | UrlTree> 
+    | Promise<boolean | UrlTree> 
+    | boolean 
+    | UrlTree {
+    //return true;
+    //return false;
+    if(this.authSvc.isLogged){
+      return true;
+    }
+    console.log('Access denied! :(');
+    this.router.navigateByUrl('/login');
+    return false;
+  }
+  
+}
+
+14- Finalmente debe quedar así la página  "home.page.html"
+
+
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>
+      El Ricon Del Libro
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+ <ion-content>
+
+  <!-- LogOut -->
+  <ion-content>
+    <ion-button size="large" (click)="onLogout()">Logout</ion-button>
+    <ion-button size="large" routerLink="/admin">Admin</ion-button>
+  </ion-content>
+  <!-- fin LogOut -->
+
+  <ion-list>
+    <ng-container *ngIf="!todos || todos.length == 0">
+      <div *ngFor="let n of [0,1,2]" padding>
+        <ion-skeleton-text></ion-skeleton-text>
+        <p>
+          <ion-skeleton-text class="text-skeleton"></ion-skeleton-text>
+        </p>
+      </div>
+    </ng-container>
+    <ion-item-sliding *ngFor="let todo of todos">
+      <ion-item lines="inset" button [routerLink]="['/details', todo.id]">
+        <ion-label>
+          {{ todo.task }}
+        </ion-label>
+        <ion-note slot="end" color="primary">{{ todo.priority }}</ion-note>
+      </ion-item>
+ 
+      <ion-item-options side="end">
+        <ion-item-option (click)="remove(item)" color="secondary">
+          Check
+          <ion-icon name="checkmark" slot="end"></ion-icon>
+        </ion-item-option>
+      </ion-item-options>
+    </ion-item-sliding>
+  </ion-list>
+ <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button routerLink="/details" routerDirection="forward">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+ </ion-content>
+
+
+15- modificamos "home.page.html" debe quedar así:
+
+import { Component, OnInit } from '@angular/core';
+import { TaskI } from '../models/task.interface';
+import { TodoService } from '../services/todo.service';
+import { Router } from '@angular/router';
+import { AngularFireAuth } from '@angular/fire/auth';
+import { AuthService } from '../services/auth.service';
+
+@Component({
+  selector: 'app-home',
+  templateUrl: 'home.page.html',
+  styleUrls: ['home.page.scss'],
+})
+export class HomePage implements OnInit{
+  todos: TaskI[];
+
+  constructor(
+    private todoService: TodoService, 
+    private authSvc: AuthService,
+    private router: Router,
+    private afAuth: AngularFireAuth
+  ){}
+  
+  ngOnInit(){
+    this.todoService.getTodos().subscribe((todos) =>{
+      console.log('Todoss', todos);
+      this.todos = todos;
+    })
+  }
+  //remueve registro
+  onRemove(idTask:string){
+    this.todoService.removeTodo(idTask);
+  }
+  //cerrar sesión
+  onLogout(){
+    console.log('Logout!');
+    this.afAuth.auth.signOut(); //metodo signOut
+    //una vez deslogueado redirige
+    this.router.navigateByUrl('/login');
+  }
+}

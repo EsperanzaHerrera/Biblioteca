@@ -13,13 +13,19 @@ import { NavController, LoadingController } from '@ionic/angular';
 export class TodoDetailsPage implements OnInit {
   
   todo: TaskI = {
-    task: '',
-    priority: 0
+    nombre_libro: '',
+    autor: '',
+    fecha_publi: '', 
+    descripcion: ''
   };
 
   todoId= null;
 
-  constructor(private route: ActivatedRoute, private nav: NavController, private todoService: TodoService, private loadingController: LoadingController) { }
+  constructor(
+    private route: ActivatedRoute, 
+    private nav: NavController, 
+    private todoService: TodoService, 
+    private loadingController: LoadingController) { }
 
   ngOnInit() {
     this.todoId = this.route.snapshot.params['id'];
